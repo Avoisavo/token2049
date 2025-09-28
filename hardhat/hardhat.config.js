@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+/** @type import('hardhat/config').HardhatUserConfig */
 
 module.exports = {
   solidity: {
@@ -18,5 +19,9 @@ module.exports = {
       accounts: [process.env.PRIVATE_KEY],
     },
   },
+  sourcify: {
+    enabled: true
+  }
+  
 };
 
