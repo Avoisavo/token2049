@@ -1,13 +1,22 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
-/** @type import('hardhat/config').HardhatUserConfig */
+
 module.exports = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+      viaIR: true,   // 👈 This must be inside `settings`
+    },
+  },
   networks: {
     sapphireTestnet: {
-      url: process.env.SAPPHIRE_TESTNET_RPC,
+      url: "https://testnet.sapphire.oasis.io", // adjust if needed
       accounts: [process.env.PRIVATE_KEY],
-      chainId: 0x5aff, // 23295
-    }
-  }
+    },
+  },
 };
+

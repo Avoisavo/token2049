@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol";
 
-contract SimpleBet is SiweAuth {
+contract Bet is SiweAuth {
     address private _owner;
     uint256 private _nextBetId = 1;
     
@@ -28,7 +28,7 @@ contract SimpleBet is SiweAuth {
         uint256 payout;         // Payout received from this platform
     }
     
-    struct Bet {
+    struct BetInfo {
         uint256 id;
         address user;
         uint256 totalAmount;    // Total amount across all subbets
@@ -41,7 +41,7 @@ contract SimpleBet is SiweAuth {
     }
     
     // Private bet details (secret, accessible only with SIWE auth)
-    Bet[] private _betMetas;
+    BetInfo[] private _betMetas;
     
     mapping(address => uint256[]) private _userBets;
     mapping(address => uint256) public userBalances;
@@ -128,7 +128,7 @@ contract SimpleBet is SiweAuth {
         
         // Create the main bet
         _betMetas.push();
-        Bet storage newBet = _betMetas[_betMetas.length - 1];
+        BetInfo storage newBet = _betMetas[_betMetas.length - 1];
         newBet.id = betId;
         newBet.user = msg.sender;
         newBet.totalAmount = msg.value;
@@ -170,14 +170,14 @@ contract SimpleBet is SiweAuth {
         bytes memory token,
         uint256 offset,
         uint256 count
-    ) external view returns (Bet[] memory) {
+    ) external view returns (BetInfo[] memory) {
         address user = authMsgSender(token);
         require(user != address(0), "Invalid authentication token");
         
         uint256[] memory userBetIndices = _userBets[user];
         
         if (offset >= userBetIndices.length) {
-            return new Bet[](0);
+            return new BetInfo[](0);
         }
         
         uint256 end = offset + count;
@@ -185,7 +185,7 @@ contract SimpleBet is SiweAuth {
             end = userBetIndices.length;
         }
         
-        Bet[] memory result = new Bet[](end - offset);
+        BetInfo[] memory result = new BetInfo[](end - offset);
         for (uint256 i = offset; i < end; i++) {
             result[i - offset] = _betMetas[userBetIndices[i]];
         }
@@ -221,7 +221,7 @@ contract SimpleBet is SiweAuth {
         require(found, "Bet not found");
         require(_betMetas[betIndex].status == BetStatus.Active, "Bet already resolved");
         
-        Bet storage bet = _betMetas[betIndex];
+        BetInfo storage bet = _betMetas[betIndex];
         uint256 totalPayout = 0;
         
         // Resolve all subbets with 2x multiplier
@@ -274,7 +274,7 @@ contract SimpleBet is SiweAuth {
         require(found, "Bet not found");
         require(_betMetas[betIndex].status == BetStatus.Active, "Bet already resolved");
         
-        Bet storage bet = _betMetas[betIndex];
+        BetInfo storage bet = _betMetas[betIndex];
         bet.status = BetStatus.Cancelled;
         
         // Cancel all active subbets
@@ -337,7 +337,7 @@ contract SimpleBet is SiweAuth {
         // Find the bet in the array
         for (uint256 i = 0; i < _betMetas.length; i++) {
             if (_betMetas[i].id == betId) {
-                Bet storage bet = _betMetas[i];
+                BetInfo storage bet = _betMetas[i];
                 return (
                     bet.id,
                     bet.user,
@@ -417,11 +417,11 @@ contract SimpleBet is SiweAuth {
         bytes memory token,
         uint256 offset,
         uint256 count
-    ) external view returns (Bet[] memory) {
+    ) external view returns (BetInfo[] memory) {
         address user = authMsgSender(token);
         require(user != address(0), "Invalid authentication token");
         if (offset >= _betMetas.length) {
-            return new Bet[](0);
+            return new BetInfo[](0);
         }
         
         uint256 end = offset + count;
@@ -429,7 +429,7 @@ contract SimpleBet is SiweAuth {
             end = _betMetas.length;
         }
         
-        Bet[] memory result = new Bet[](end - offset);
+        BetInfo[] memory result = new BetInfo[](end - offset);
         for (uint256 i = offset; i < end; i++) {
             result[i - offset] = _betMetas[offset + i];
         }
@@ -445,7 +445,7 @@ contract SimpleBet is SiweAuth {
     function getBet(
         bytes memory token,
         uint256 betIndex
-    ) external view returns (Bet memory) {
+    ) external view returns (BetInfo memory) {
         address user = authMsgSender(token);
         require(user != address(0), "Invalid authentication token");
         require(betIndex < _betMetas.length, "Bet does not exist");
