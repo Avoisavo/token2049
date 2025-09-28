@@ -1,8 +1,0 @@
-{
-  "optimism-sepolia": {
-    "Bet": {
-      "address": "0x41f5F91b21407DB323b4Bcc35C931326D14b26dA",
-      "startBlock": 13674202
-    }
-  }
-}
