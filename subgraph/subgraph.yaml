@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Bet
-    network: arbitrum-sepolia
+    network: oasis-testnet
     source:
-      address: "0x4d166eb07E37b61BB42f56206cBa3ECb1872A340"
+      address: "0x41f5F91b21407DB323b4Bcc35C931326D14b26dA"
       abi: Bet
-      startBlock: 199015095
+      startBlock: 13674202
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -22,7 +22,7 @@ dataSources:
         - SubBetPlaced
       abis:
         - name: Bet
-          file: ./abis/Bet.json
+          file: ../hardhat/artifacts/contracts/Bet.sol/Bet.json
       eventHandlers:
         - event: BetPlaced(indexed uint256,indexed address,uint256,uint256,uint256)
           handler: handleBetPlaced
